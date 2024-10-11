@@ -8,6 +8,9 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace OilGas.Controllers
 {
+    /// <summary>
+    /// Controladora referente a manipulação dos dados dos sensores da planta de Óleo e Gás
+    /// </summary>
     public class SensorController : ControllerBase
     {
         private readonly SensorContext _sensorContext;
