@@ -3,23 +3,23 @@
 namespace OilGas.DTO
 {
     /// <summary>
-    /// Atributo para inserir unidade de leitura do sensor no banco
+    /// Attribute to insert sensor reading unit into the Database
     /// </summary>
     public class SensorDataDTO
     {
 
         /// <summary>
-        /// ID do equipamento
+        /// Equipment ID
         /// </summary>
         [Required]
         public string EquipmentId { get; set; }
         /// <summary>
-        /// Momento da leitura com o devido fuso horário
+        /// Reading time with the appropriate time zone
         /// </summary>
         [Required]
         public DateTime TimeStamp { get; set; }
         /// <summary>
-        /// Valor da leitura
+        /// Value of reading
         /// </summary>
         [Required]
         public decimal Value { get; set; }
