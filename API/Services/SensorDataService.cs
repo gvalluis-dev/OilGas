@@ -19,7 +19,7 @@ namespace OilGas.Services
 
         public async Task AddSensorData(SensorDataDTO sensorDataDTO)
         {
-            //Converte o DTO em uma entidade
+            //Converts the DTO into an entity
             var sensorData = new SensorData
             {
                 EquipmentId = sensorDataDTO.EquipmentId,
@@ -27,7 +27,7 @@ namespace OilGas.Services
                 TimeStamp = sensorDataDTO.TimeStamp
             };
 
-            //Insere entidade no banco de dados
+            //Inserts entity into the database
             _context.SensorData.Add(sensorData);
             await _context.SaveChangesAsync();
             
@@ -37,7 +37,7 @@ namespace OilGas.Services
         {
             using (var stream = new StreamReader(file.OpenReadStream()))
             {
-                //Pula a primeira linha - cabeçalho
+                //Skip the first line - header
                 stream.ReadLine();
 
                 while (!stream.EndOfStream)

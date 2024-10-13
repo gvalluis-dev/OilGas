@@ -9,7 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace OilGas.Controllers
 {
     /// <summary>
-    /// Controladora referente a manipulação dos dados dos sensores da planta de Óleo e Gás
+    /// Controller regarding the handling of data from Oil and Gas plant sensors
     /// </summary>
     public class SensorController : ControllerBase
     {
@@ -22,8 +22,18 @@ namespace OilGas.Controllers
         }
 
         /// <summary>
-        /// Insere o dado de um sensor, de forma unitária
+        /// Inserts data from a sensor, in a unitary form
         /// </summary>
+        ///   /// <remarks>
+        /// Payload Example:
+        /// 
+        ///     POST /api/sensor
+        ///     {
+        ///        "equipmentId": "EQ-12495",
+        ///        "timestamp": "2023-02-15T01:30:00.000-05:00",
+        ///        "value": 78.42
+        ///     }
+        /// </remarks>
         /// <param name="data"></param>
         /// <returns></returns>
         [HttpPost("sensor")]
@@ -34,34 +44,38 @@ namespace OilGas.Controllers
         }
 
         /// <summary>
-        /// Insere dados em lote usando um arquivo CSV
+        /// Batch insert data using a CSV file
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
+        [SwaggerOperation(Summary = "Upload a CSV file with missing sensor data",
+        Description = "This endpoint allows you to send a CSV file containing lost sensor data to be stored in the database.")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost("upload-csv")]
         public async Task<IActionResult> UploadCsv(IFormFile file)
         {
             if (file == null || file.Length == 0)
-                return BadRequest("O Arquivo não foi enviado");
+                return BadRequest("The file was not sent");
 
             await _sensorDataService.AddSensorDataCSV(file);
-            return Ok("Dados dos sensores importados com sucesso");
+            return Ok("Sensor data imported successfully");
         }
 
         /// <summary>
-        /// Calcula a média dos valores dos sensores em um determinado período.
+        /// Calculates the average of sensor values ​​over a given period.
         /// </summary>
-        /// <param name="period">O período para o cálculo da média. Valores possíveis: 24h, 48h, 1w (1 semana), 1m (1 mês).</param>
-        /// <returns>A média dos valores dos sensores no período especificado.</returns>
+        /// <param name="period">The period for calculating the average. Possible values: 24h, 48h, 1w (1 week), 1m (1 month).</param>
+        /// <returns>The average of the sensor values ​​over the specified period.</returns>
         [HttpGet("average")]
-        [SwaggerOperation(Summary = "Calcula a média dos valores dos sensores em um determinado período.",
-                      Description = "Períodos disponíveis: 24h, 48h, 1w (1 semana), 1m (1 mês).")]
+        [SwaggerOperation(Summary = "Calculates the average of sensor values ​​over a given period.",
+                      Description = "Available periods: 24h, 48h, 1w (1 week), 1m (1 month).")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetSensorAverage([FromQuery] string period)
         {
-            // Definir o intervalo de tempo com base no parâmetro 'period'
+            // Set time interval based on 'period' parameter
             DateTime fromDate = DateTime.Now;
 
             switch (period.ToLower())
@@ -79,27 +93,33 @@ namespace OilGas.Controllers
                     fromDate = DateTime.Now.AddMonths(-1); // 1 mês
                     break;
                 default:
-                    return BadRequest("Período inválido. Use 24h, 48h, 1w, ou 1m.");
+                    return BadRequest("Invalid period. Use 24h, 48h, 1w, or 1m.");
             }
 
-            // Buscar os dados dos sensores a partir do intervalo de tempo
+            // Fetch sensor data from time range
             var sensorData = _sensorContext.SensorData
                                      .Where(s => s.TimeStamp >= fromDate)
                                      .ToList();
 
+
+
             if (sensorData.Count == 0)
             {
-                return NotFound("Nenhum dado encontrado para o período especificado.");
+                return NotFound("No data found for the specified period.");
             }
 
-            // Calcular a média dos valores dos sensores
-            var averageValue = sensorData.Average(s => s.Value);
-
-            return Ok(new
+            // Calculate the average of sensor values
+            var averageValues = sensorData
+            .GroupBy(s => s.EquipmentId)
+            .Select(g => new
             {
-                period = period,
-                average = averageValue
-            });
+                EquipmentId = g.Key,
+                AverageValue = g.Average(s => s.Value)
+            })
+            .ToList();
+
+
+            return Ok(averageValues);
         }
     }
 }

@@ -14,7 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
-        policy => policy.WithOrigins("http://localhost:5173") // URL da aplicação React
+        policy => policy.WithOrigins("http://localhost:5173") // React Application URL
                         .AllowAnyMethod()
                         .AllowAnyHeader());
 });
@@ -27,14 +27,13 @@ builder.Services.AddSwaggerGen(options =>
     {
         Version = "v1",
         Title = "Sensor Data API",
-        Description = "Essa API disponibiliza dados e operações sobre eles de uma planta de Óleo e Gás",
+        Description = "This API provides data and operations on them from an Oil and Gas plant.",
     });
 
     // Habilita a documentação via Swashbuckle
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
-
 
 
 //Dependency Injection
@@ -57,8 +56,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Configurar o middleware CORS
-app.UseCors("AllowReactApp"); // Use a política de CORS configurada
+//Configure CORS middleware
+app.UseCors("AllowReactApp"); // Use the configured CORS policy
 
 app.UseHttpsRedirection();
 
