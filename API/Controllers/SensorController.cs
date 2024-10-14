@@ -111,7 +111,7 @@ namespace OilGas.Controllers
             // Calculate the average of sensor values
             var averageValues = sensorData
             .GroupBy(s => s.EquipmentId)
-            .Select(g => new
+            .Select(g => new SensorAverageDTO
             {
                 EquipmentId = g.Key,
                 AverageValue = g.Average(s => s.Value)

@@ -11,10 +11,9 @@ namespace OilGas.Services
         private readonly SensorContext _context;
         private readonly IMapper _mapper;
 
-        public SensorDataService(SensorContext context, IMapper mapper)
+        public SensorDataService(SensorContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public async Task AddSensorData(SensorDataDTO sensorDataDTO)

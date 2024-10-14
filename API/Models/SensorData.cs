@@ -5,6 +5,9 @@ namespace OilGas.Models
 {
     public class SensorData
     {
+        // <summary>
+        /// PK
+        /// </summary>
         [Key]
         public int Id { get; set; }
         /// <summary>
